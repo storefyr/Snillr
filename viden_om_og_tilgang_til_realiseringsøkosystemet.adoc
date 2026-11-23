@@ -42,7 +42,7 @@ Den menneskelige konceptualisator og realiseringsorkestrator er det eneste menne
 | Implementerer én funktion ad gangen og kører de parrede tests, før `passerer` sættes til sand.
 
 | Slutbrugeranvendelighedssonderingsstokastiker
-| Vurderings-JSON'er om slutbrugerens oplevelse (ansvarlighed, intuitivitet, kohærens)
+| Vurderings-JSON'er om slutbrugerens oplevelse (anskuelighed, intuitivitet, kohærens)
 | Sonderer på den kørende app på måleenheden og leverer vurderingen tilbage i kæden til Strategistokastikeren.
 
 | Kildesondringsstokastiker (hovedstokastiker / informationsstokastiker)
