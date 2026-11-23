@@ -64,7 +64,7 @@ Kæden er lukket og sporbar i begge retninger:
 
 * Strategistokastikeren modtager strategiske eskaleringer fra Projektstokastikeren vedrørende arkitektoniske brister og besvarer dem ved at justere planen.
 * Projektstokastikeren udsteder taktiske ordrer til Realiseringsstokastikeren via realiseringsmanifestet.
-* Alle artefakter gøres persistente af Suffløreren i kildekodelageret; integration af stokastikeres PRs i hovedgrenen udføres af stokastikere — enhver stokastiker, ikke kun Sufflør — og aldrig af den menneskelige orkestrator (præcisering 2026-11-23).
+* Alle artefakter gøres persistente af rollen Sufflør i kildekodelageret; integration af stokastikeres PRs i hovedgrenen udføres af stokastikere — enhver stokastiker, ikke kun Sufflør — og aldrig af den menneskelige orkestrator (præcisering 2026-11-23).
 
 Triage-logik ved kildesondringsvurdering:
 
