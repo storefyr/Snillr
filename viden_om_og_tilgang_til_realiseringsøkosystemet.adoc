@@ -1,0 +1,129 @@
+= Viden om og tilgang til realiseringsøkosystemet
+:toc: left
+:sectnums:
+:lang: da
+:description: Orkestreringsstokastikerens udtræk af generel viden og erfaring fra Skrynja_2 — anvendelig for enhver realisering af ethvert distributionsartefakt
+
+== Formål og oprindelse
+
+Dette artefakt er Orkestreringsstokastikerens udtræk af viden om og tilgang til realiseringsøkosystemet fra kildeøkosystemet `storefyr/Skrynja_2` (kilder: `projektbeskrivelse.adoc`, `realiseringsmanifest_for_funktioner_og_parrede_tests.json`, vurderings-JSON'erne og git-historikken).
+
+Indholdet er ikke knyttet til Skrynja_2's eget distributionsartefakt (app, platform, packaging) — det gælder for enhver realisering af et hvilket som helst distributionsartefakt i ethvert depot. Se afsnittet *Hvad der blev i Skrynja_2* nederst.
+
+* Producent: Orkestreringsstokastikeren.
+* Konsument: enhver stokastiker i ethvert realiseringsøkosystem.
+* Licens: GPL-3.0 (samme som kildeøkosystemet).
+
+== Vision: realisering som en kæde af stokastikere
+
+En realisering gennemføres ikke af én enkelt rolle, men af et *realiseringsøkosystem*: en kæde af stokastikere, hvor hver rolle leverer ét navngivet artefakt til den næste. Visionen er at gøre hele kæden — fra menneskelig konceptualisering over strategi og taktisk planlægning til realisering og uafhængig vurdering — eksplicit, målelig og genoptagelig.
+
+Den menneskelige konceptualisator og realiseringsorkestrator er det eneste menneske i realiseringsmiljøet; alle øvrige aktører er stokastikere. Orkestratoren er den eneste kilde til nye strategiske ønsker.
+
+== Roller og artefakter
+
+|===
+| Rolle | Artefakt | Ansvar
+
+| Menneskelig konceptualisator og realiseringsorkestrator
+| Visionen (håndtegnet skitse)
+| Konceptualiserer visionen og orkestrerer realiseringen; eneste kilde til nye strategiske ønsker.
+
+| Strategistokastiker
+| Projektbeskrivelse (strategisk plan, f.eks. `projektbeskrivelse.adoc`)
+| Ejer den overordnede plan og er garant for visionens integritet; modtager strategiske eskaleringer vedrørende arkitektoniske brister og besvarer dem ved at justere planen.
+
+| Projektstokastiker
+| Realiseringsmanifest for funktioner og parrede tests (JSON + parrede tests i `tests/`)
+| Bryder strategien ned i funktioner med målelige verifikations_trin; udsteder taktiske ordrer til Realiseringsstokastikeren én funktion ad gangen; eskalerer arkitektoniske brister opad.
+
+| Realiseringsstokastiker
+| Realiseringsartefakt (kildekode) eller distributionsartefakt (pakke)
+| Implementerer én funktion ad gangen og kører de parrede tests, før `passerer` sættes til sand.
+
+| Slutbrugeranvendelighedssonderingsstokastiker
+| Vurderings-JSON'er om slutbrugerens oplevelse (ansvarlighed, intuitivitet, kohærens)
+| Sonderer på den kørende app på måleenheden og leverer vurderingen tilbage i kæden til Strategistokastikeren.
+
+| Kildesondringsstokastiker (hovedstokastiker / informationsstokastiker)
+| Vurdering af realiseringsartefaktets arkitektur, fragilitet og støjindhold (JSON)
+| Udfører semantisk kontrol af projektets retning ved audit af kildekoden.
+
+| Sufflør
+| Artefakt i kildekodelageret (git-indskrivninger)
+| Gør hver stokastikers artefakt persistent og sporbar via indskrivninger med beskrivende beskeder.
+
+| Orkestreringsstokastiker
+| Videnoverførsel mellem økosystemer (denne fil)
+| Ekstraherer generel viden og erfaring fra ét realiseringsøkosystem og gør den anvendelig for enhver anden realisering.
+|===
+
+== Kommandokæde og eskalering
+
+Kæden er lukket og sporbar i begge retninger:
+
+* Strategistokastikeren modtager strategiske eskaleringer fra Projektstokastikeren vedrørende arkitektoniske brister og besvarer dem ved at justere planen.
+* Projektstokastikeren udsteder taktiske ordrer til Realiseringsstokastikeren via realiseringsmanifestet.
+* Alle artefakter gøres persistente af Suffløreren i kildekodelageret.
+
+Triage-logik ved kildesondringsvurdering:
+
+* *Støj* (død kode, ubrugte lag, duplikeret logik): direkte rengøringsordre til Realiseringsstokastikeren uden ny funktionalitet; rengøringen dækkes af den eksisterende parrede test.
+* *Fragilitet*: nye parrede tests eller verifikations_trin føjes til manifestet for den berørte funktion; eksisterende trin må ikke fjernes.
+* *Arkitektoniske brister*: eskaleres til Strategistokastikeren for plan-revision — de løses ikke lokalt i kildekoden.
+
+== Arbejdsregler
+
+. Én funktion ad gangen i manifestets rækkefølge — ingen trin springes over.
+. Intet implementeres uden den parrede test; testen indskrives før den kilde, den afprøver, og registreres i testsuitens byggefil.
+. `passerer` sættes først til sand, når hvert verifikations_trin er kørt med en gengivelig uddata, der er målt — ingen påstand om et udfald uden en måling.
+. Redigeringsregel for manifestet: en post må kun ændres ved at sætte `passerer` fra false til sand efter målte trin; navn, beskrivelse, filer, parret test og verifikations_trin må ikke fjernes eller omskrives.
+. Genoptagelsesregel ved ny arbejdsgang: kør `pwd` og `git status`, kør `git log --oneline -20`, læs realiseringsmanifestet, og vælg den første funktion i rækkefølgen med `passerer: false`.
+. Efter hver arbejdsgang indskrives ændringerne med en beskrivende besked, så næste samtale kan læse fremdriften i git-historikken.
+. Semantisk kontrol løbende: kildekoden skal altid kunne læses tilbage til planen og manifestets verifikations_trin; hver afvigelse skal kunne begrundes.
+. Spejlingsregel (plan ↔ manifest): når en realisering har både plan og manifest, må de aldrig divergere — ændres det ene artefakt, opdateres det andet af sin ejer i samme PR. Håndhæves automatisk af en parret kontrol i værtsløkken (planens rækkefølge skal svare til manifestets rækkefølge, og nøglereglerne skal findes i begge artefakter); en PR, der kun rører det ene artefakt, fejler kontrollen.
+. Nye kildefiler registreres i byggefilen; nye brugerflade-filer registreres til installation.
+. Hemmeligheder: ingen nøgler, adgangstokens eller samtale-transskripter må nogensinde ind i depotet eller i logfiler; et hemmelighedsfilter i loggen fanger adgangstoken-lignende strenge.
+. Sprog: alle stokastikere — også nystartede — kommunikerer udelukkende på dansk med hinanden og med den menneskelige realiseringsorkestrator. Kode og kodekommentarer er engelske; dokumentation, brugerflade, indskrivningsbeskeder og PR-titler er danske.
+. Ortografi: ortografisk dansk (æ, ø, å) i al prosa, nøgler, id'er og navne — ingen ascii-udvanding (aa/ae/oe). Fysisk tvangne undtagelser (identifikatorer i sprog uden æøå-støtte, protokolstrenge på ledningsformat, platformsnavne) minimeres og dokumenteres hver gang.
+. Terminologi: dansk frem for engelsk fagsprog i prosa — `merge`→integration/integreres/integreret, `draft`→kladde, `commit`→indskrivning, `branch`→gren, `backend`→bagvedliggende system, `token`→adgangstoken. Egennavne, protokol-/platformtermer samt kommandoer og API-stier i backticks undtages; i historiske logposter bevares id'er, hashes og citeret tekst, men terminologien gælder også dér.
+. Stedordsregel: i artefakter og relæer mellem stokastikere bruges aldrig "jeg/du/dig/mig" — brug rollens navn (orkestratoren, strategistokastikeren, projektstokastikeren, ...), så det altid er entydigt, hvem der menes. I direkte dialog mellem to parter er stedordene entydige og tilladt.
+. Navngivning: ethvert navn — funktioner, id'er, nøgler, filer, roller, artefakter, variabler, PR-titler — skal i sig selv fortælle præcist, hvad det er et navn for, på fuldt dansk sammen med ortografi-reglen. Ingen afkortninger eller præfiks-koder (`fragilitet_...`, aldrig `fra-...`; `arkitektur_...`, aldrig `ark-...`; `støj_...` er i orden, fordi "støj" er hele ordet). Undtagelse: historiske id'er i lukkede triage-poster er uforanderlig log og omdøbes ikke; reglen gælder alle nye navne.
+. Tilbudsregel: stokastikere stiller kun tilbud eller eskaleringer til den menneskelige realiseringsorkestrator, når de følges af en måling (gengivelig uddata fra værtsløkken eller måleløkken) og et artefakt (git-indskrivning, PR, manifest-post eller vurderings-JSON). Når måling og artefakt er på plads, leveres tilbuddet direkte som artefakt uden forudgående spørgsmål — svaret kan kun være ja, så orkestratoren ikke belastes med nej-tak.
+. Ingen CI-overvågning uden CI: tjek først, om depotet har CI-arbejdsgange (`.github/workflows/`). Findes der ingen, sker verifikation i værtsløkken (parrede kontroller + testsuite samt mål-byg og kørsel på måleenheden), og der tilbydes ikke CI-overvågning. Får depotet senere CI-arbejdsgange, gælder tilbud om CI-overvågning først fra det øjeblik, de findes.
+
+== Måling: værtsløkke og måleløkke
+
+Udviklingshastigheden højnes ved at køre to adskilte løkker i stedet for én lang kæde pr. ændring. Hver stokastiker arbejder i sin egen sandkasse; måleenheden tilhører orkestratoren.
+
+*Værtsløkke (hurtig, pr. ændring, i en sandkasse med værktøjskæden):* rediger kildekode → værtsbyg → testsuite → parrede kontroller (f.eks. manifest-kontrol) → Projektstokastikeren sætter `passerer` efter måling. Hele løkken tager minutter og fanger de fleste fejl, før måleenheden ser koden. Værtsløkkens resultater tæller ikke som mål.
+
+*Måleløkke (langsom, kun ved milepæle og udgivelsesport):* mål-byg i en sandkasse med mål-SDK'en → distributionsartefakt (pakke) → udgivelse med vedhæftet fil på kildekodelageret → hentning på måleenheden → lokal installation → verifikation på enheden. Kun måleløkken tæller som mål; mål-afhængige funktioner får først `passerer: sand` efter en målt måleløkke.
+
+*Process:* saml relaterede triage-ordrer i én PR med flere parrede test-slots; kildesondrings-audit kører pr. milepæl, ikke pr. PR; dokumentationsændringer samles i samlede PRs; automatisér udgivelsesporten, så intet manuelt trin står mellem byg og hentning (hvis sandkassens API-mellemlag blokerer udgivelses-kald, køres udgivelsen via arbejdsgange på kildekodelagerets servere, hvorved filen aldrig ligger i git-træet).
+
+== Distributionsartefakt: generisk leveringskæde
+
+Distributionsartefaktet er en del af visionen og Realiseringsstokastikerens artefakt: slutbrugervurdering kan kun ske på den kørende app på måleenheden, ikke på værtstest eller ved kodelæsning.
+
+Leveringskæden i den virkelige verden: mål-byg → pakke → udgiv som vedhæftet fil på en udgivelse på kildekodelageret → hentning på måleenheden → pakke-tjek (forventet indhold) → lokal installation → verifikation på enheden (succeskriterium med målt exit-kode). Udgivelsesfiler ligger uden for git-træet — ingen binære artefakter eller logfiler i depotet nogensinde.
+
+Trinvis åbning af øgede rettigheder på måleenheden (f.eks. terminal-adgang for stokastiker-sessioner): først read-only; hver enkelt kommando går gennem en tilladelsesdialog og besvares med et enkelt svar; skrivende/destruktive kommandoer kun med eksplicit og tydelig godkendelse; hemmelighedsfilter i loggen (adgangstokens og nøgler ligger i måleenhedens nøglering, aldrig i filer); selvtest før og efter hver session med øgede rettigheder. Risikoen vurderes altid først, når måleenheden er orkestratorens eneste enhed.
+
+== Læring fra arkitektur-triage (generiske principper)
+
+* God-objekter med hård kobling accepteres ikke: opdel efter lag (protokol, session, brugerflade-modeller), hver i sin klasse, med en tynd façade foran, der kun udstiller properties og videresender signaler.
+* Test-kroge må ikke ligge i produktionsklasser: test-injektion hører i en separat test-harness; adfærd under test må ikke kunne afvige fra drift.
+* Magiske strenge (metode-navne, nøgler) samles som navngivne konstanter ét sted, så en omdøbning ikke kan give stille korrelationsfejl.
+* Afhængighedsretningen skal vende væk fra kernen: UI-lag må ikke kende transport-laget; fælles konstanter ligger i et fælles konstant-modul eller gives som parameter.
+* Konfiguration har én ejer med change-signaler — ikke skjult global tilstand læst i spredte gettere.
+* Ét model-lag, ikke to: fjern model-lag uden konsument; brugerfladen fortsætter uændret via simple list-properties.
+* Hver opdeling uden ny funktionalitet dækkes af de eksisterende parrede tests, og manifestets redigeringsregel følges (nye funktioner tilføjes, eksisterende verifikations_trin fjernes ikke).
+
+== Succeskriterium (skabelon)
+
+Et realiseringsøkosystem betragtes som realiseret, når kæden kører end-to-end på måleenheden med målt exit-kode, alle funktioner i manifestet har `passerer: sand`, alle parrede tests er grønne, alle stokastiker-artefakter ligger sporbare i kildekodelageret, og distributionsartefaktet desuden er bygget som mål-byg, udgivet på kildekodelageret, hentet, installeret og kørt igennem på måleenheden.
+
+== Hvad der blev i Skrynja_2
+
+Alt specifikt for Skrynja_2's eget distributionsartefakt bliver i kildeøkosystemets plan: app-navn og platform (Sailfish OS, Jolla Phone), teknisk ramme (Qt 5.6, kun aarch64 mål-byg), protokol og agentsti (ACP over stdio, sti til agent-binær), harbour-packaging (`.pro`, `.spec`, `.yaml`, `.desktop`, ikoner) samt mål-byg og installation med Sailfish SDK. Kun metoden, rollerne, arbejdsreglerne og erfaringerne ovenfor er overført hertil.
