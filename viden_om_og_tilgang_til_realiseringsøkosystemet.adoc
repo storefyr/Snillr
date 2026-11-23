@@ -75,7 +75,7 @@ Triage-logik ved kildesondringsvurdering:
 == Arbejdsregler
 
 . Én funktion ad gangen i manifestets rækkefølge — ingen trin springes over.
-. Intet implementeres uden den parrede test; testen indskrives før den kilde, den afprøver, og registreres i testsuitens byggefil.
+. Intet implementeres uden den parrede test; testen indskrives før den kilde, den afprøver, og registreres i testenes byggefil.
 . `passerer` sættes først til sand, når hvert verifikations_trin er kørt med en gengivelig uddata, der er målt — ingen påstand om et udfald uden en måling.
 . Redigeringsregel for manifestet: en post må kun ændres ved at sætte `passerer` fra false til sand efter målte trin; navn, beskrivelse, filer, parret test og verifikations_trin må ikke fjernes eller omskrives.
 . Genoptagelsesregel ved ny arbejdsgang: kør `pwd` og `git status`, kør `git log --oneline -20`, læs realiseringsmanifestet, og vælg den første funktion i rækkefølgen med `passerer: false`.
@@ -91,7 +91,7 @@ Triage-logik ved kildesondringsvurdering:
 . Navngivning: ethvert navn — funktioner, id'er, nøgler, filer, roller, artefakter, variabler, PR-titler — skal i sig selv fortælle præcist, hvad det er et navn for, på fuldt dansk sammen med ortografi-reglen. Ingen afkortninger eller præfiks-koder (`fragilitet_...`, aldrig `fra-...`; `arkitektur_...`, aldrig `ark-...`; `støj_...` er i orden, fordi "støj" er hele ordet). Undtagelse: historiske id'er i lukkede triage-poster er uforanderlig log og omdøbes ikke; reglen gælder alle nye navne.
 . Tilbudsregel: stokastikere stiller kun tilbud eller eskaleringer til den menneskelige realiseringsorkestrator, når de følges af en måling (gengivelig uddata fra værtsløkken eller måleløkken) og et artefakt (git-indskrivning, PR, manifest-post eller vurderings-JSON). Når måling og artefakt er på plads, leveres tilbuddet direkte som artefakt uden forudgående spørgsmål — svaret kan kun være ja; orkestratoren handler på artefaktet ved at prompte stokastikere (integration, beslutning, nyt strategisk ønske), og selve integrationen udføres altid af en stokastiker.
 . Ingen CI-overvågning uden CI: tjek først, om depotet har CI-arbejdsgange (`.github/workflows/`). Findes der ingen, sker verifikation i værtsløkken (parrede kontroller + testsuite samt mål-byg og kørsel på måleenheden), og der tilbydes ikke CI-overvågning. Får depotet senere CI-arbejdsgange, gælder tilbud om CI-overvågning først fra det øjeblik, de findes.
-. Integrationsregel: integration af PRs i hovedgrenen udføres udelukkende af stokastikere — med hvilken som helst mekanisme der virker i det pågældende miljø (git push, API-kald eller andet; blokerer sandkassens API-mellemlag merge-kald, er git push den virkende vej). Den menneskelige orkestrator har aldrig udført en integration i noget depot — programmel fremkaldes udelukkende ved, at orkestratoren prompter maskinelle stokastikere (orkestratorens præcisering 2026-11-23).
+. Integrationsregel: integration af PRs i hovedgrenen udføres udelukkende af stokastikere — med hvilken som helst mekanisme der virker i det pågældende miljø (git push, API-kald eller andet; blokerer sandkassens API-mellemlag `merge`-kald, er git push den virkende vej). Den menneskelige orkestrator har aldrig udført en integration i noget depot — programmel fremkaldes udelukkende ved, at orkestratoren prompter maskinelle stokastikere (orkestratorens præcisering 2026-11-23).
 
 == Måling: værtsløkke og måleløkke
 
@@ -101,7 +101,7 @@ Udviklingshastigheden højnes ved at køre to adskilte løkker i stedet for én 
 
 *Måleløkke (langsom, kun ved milepæle og udgivelsesport):* mål-byg i en sandkasse med mål-SDK'en → distributionsartefakt (pakke) → udgivelse med vedhæftet fil på kildekodelageret → hentning på måleenheden → lokal installation → verifikation på enheden. Kun måleløkken tæller som mål; mål-afhængige funktioner får først `passerer: sand` efter en målt måleløkke.
 
-*Process:* saml relaterede triage-ordrer i én PR med flere parrede test-slots; kildesondrings-audit kører pr. milepæl, ikke pr. PR; dokumentationsændringer samles i samlede PRs; automatisér udgivelsesporten, så intet manuelt trin står mellem byg og hentning (hvis sandkassens API-mellemlag blokerer udgivelses-kald, køres udgivelsen via arbejdsgange på kildekodelagerets servere, hvorved filen aldrig ligger i git-træet).
+*Proces:* saml relaterede triage-ordrer i én PR med flere parrede test-slots; kildesondrings-audit kører pr. milepæl, ikke pr. PR; dokumentationsændringer samles i samlede PRs; automatisér udgivelsesporten, så intet manuelt trin står mellem byg og hentning (hvis sandkassens API-mellemlag blokerer udgivelses-kald, køres udgivelsen via arbejdsgange på kildekodelagerets servere, hvorved filen aldrig ligger i git-træet).
 
 == Distributionsartefakt: generisk leveringskæde
 
@@ -113,12 +113,12 @@ Trinvis åbning af øgede rettigheder på måleenheden (f.eks. terminal-adgang f
 
 == Læring fra arkitektur-triage (generiske principper)
 
-* God-objekter med hård kobling accepteres ikke: opdel efter lag (protokol, session, brugerflade-modeller), hver i sin klasse, med en tynd façade foran, der kun udstiller properties og videresender signaler.
+* God-objekter med hård kobling accepteres ikke: opdel efter lag (protokol, session, brugerflade-modeller), hver i sin klasse, med en tynd façade foran, der kun udstiller Q_PROPERTYs og videresender signaler.
 * Test-kroge må ikke ligge i produktionsklasser: test-injektion hører i en separat test-harness; adfærd under test må ikke kunne afvige fra drift.
 * Magiske strenge (metode-navne, nøgler) samles som navngivne konstanter ét sted, så en omdøbning ikke kan give stille korrelationsfejl.
 * Afhængighedsretningen skal vende væk fra kernen: UI-lag må ikke kende transport-laget; fælles konstanter ligger i et fælles konstant-modul eller gives som parameter.
 * Konfiguration har én ejer med change-signaler — ikke skjult global tilstand læst i spredte gettere.
-* Ét model-lag, ikke to: fjern model-lag uden konsument; brugerfladen fortsætter uændret via simple list-properties.
+* Ét model-lag, ikke to: fjern model-lag uden konsument; brugerfladen fortsætter uændret via QVariantList-properties.
 * Hver opdeling uden ny funktionalitet dækkes af de eksisterende parrede tests, og manifestets redigeringsregel følges (nye funktioner tilføjes, eksisterende verifikations_trin fjernes ikke).
 
 == Succeskriterium (skabelon)
