@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Sprog- og ortografikontrol i vartslokken — to lag.
+"""Sprog- og ortografikontrol i værtsløkken — tre lag.
 
-Lag 1, forbudte monstre i prosa (kun prosa-artefakter: .adoc .md .json .py .txt;
+Lag 1, forbudte mønstre i prosa (kun prosa-artefakter: .adoc .md .json .py .txt;
 kildekode er engelsk/ascii efter sprog-reglen og er en tvangne undtagelse):
   - ascii-udvanding af dansk (aa/ae/oe i stedet for å/æ/o),
   - engelske fagord (merge/draft/commit/branch/backend/token, persistence,
@@ -17,6 +17,12 @@ eskalering, historisk, lukket, aa/ae/oe). Kontrollen selv undtages.
 Lag 2, stavetjek mod ordliste: hvis en dansk ordliste findes (--ordliste
 <sti> eller /usr/share/dict/da*), tjekkes hver prosa-token mod den; ellers
 bruges den indbyggede liste over kendte fejl (KENDTE_FEJL).
+
+Lag 3, bindestregsbrug: dansk skrives sammenhængende (uden bindestreg);
+bindestreg tillades ved låneord/forkortelser og tekniske termer (git-, mål-,
+ascii-, test-, host-loop, know-how, read-only, end-to-end m.fl.). Danske
+enkeltord, der ikke må splittes med bindestreg, står i KENDTE_BINDESTREG_FEJL
+(f.eks. genoptagelses-regel -> genoptagelsesregel).
 
 Exit 0 hvis rent, ellers exit 1 med alle fund (fil:linje: hvad).
 """
@@ -45,13 +51,20 @@ ENGELSK_FAGORD = re.compile(
 )
 STEDORD = re.compile(r"\b(?:jeg|du|dig|mig)\b", re.IGNORECASE)
 
-TILLADTE_LINJER = ("regel", "ortografi", "terminologi", "stedord",
+TILLADTE_LINJER = ("stedordsregel", "terminologi", "ortografi",
                    "eskalering", "historisk", "lukket", "aa/ae/oe",
                    "ascii", "kommando", ".cpp", "filnavn")
 
 KENDTE_FEJL = {
     "rollentabel": "rolletabel",
 }
+
+KENDTE_BINDESTREG_FEJL = {
+    "genoptagelses-regel": "genoptagelsesregel",
+    "genoptagelsesregel-testen": "genoptagelsesregeltesten",
+}
+
+BINDESTREG_SAMMENSAT = re.compile(r"\b[A-Za-zÆØÅæøå]+-[A-Za-zÆØÅæøå]+(?:-[A-Za-zÆØÅæøå]+)*\b")
 
 TILLADTE_TEKNISKE = {
     "pr", "ci", "api", "json", "sdk", "qml", "qt", "acp", "rpm", "github",
@@ -94,7 +107,13 @@ def tjek_fil(sti, ordliste, filnavne):
             lav = linje.lower()
             if any(t in lav for t in TILLADTE_LINJER):
                 continue
-            tekst = KLASSE_NAVN.sub(" ", IDENTIFIKATOR.sub(" ", TEKNISK_SAMMENSAT.sub(" ", BACKTICK.sub(" ", linje))))
+            tekst0 = IDENTIFIKATOR.sub(" ", BACKTICK.sub(" ", linje))
+            for m in BINDESTREG_SAMMENSAT.finditer(tekst0):
+                ord_ = m.group(0)
+                lav = ord_.lower()
+                if lav in KENDTE_BINDESTREG_FEJL:
+                    fund.append((nr, "bindestreg i enkeltord: %s -> %s" % (ord_, KENDTE_BINDESTREG_FEJL[lav])))
+            tekst = KLASSE_NAVN.sub(" ", TEKNISK_SAMMENSAT.sub(" ", tekst0))
             for m in ASCII_UDVANDING.finditer(tekst):
                 if m.group(0) in filnavne:
                     continue
@@ -114,7 +133,7 @@ def tjek_fil(sti, ordliste, filnavne):
 
 
 def main():
-    p = argparse.ArgumentParser(description="Sprog- og ortografikontrol (vartsløkke)")
+    p = argparse.ArgumentParser(description="Sprog- og ortografikontrol (værtsløkke)")
     p.add_argument("--rod", default=ROOT, help="rod-mappe der skannes (default: scriptets mappe)")
     p.add_argument("--ordliste", default=None, help="sti til dansk ordliste (valgfrit)")
     args = p.parse_args()
@@ -123,16 +142,7 @@ def main():
     ordliste = las_ordliste(ordliste_sti) if ordliste_sti else None
 
     filnavne = set()
-    for dirpath, dirnames, filenames in os.walk(args.rod):
-        dirnames[:] = [d for d in dirnames if d != ".git"]
-        for navn in filenames:
-            filnavne.add(os.path.splitext(navn)[0].lower())
-    if ordliste_sti:
-        print("ordliste: %s (%d ord)" % (ordliste_sti, len(ordliste)))
-    else:
-        print("ordliste: ingen system-ordliste fundet — bruger kun indbygget KENDTE_FEJL")
-
-    alle_fund = []
+    prosa_filer = []
     for dirpath, dirnames, filenames in os.walk(args.rod):
         dirnames[:] = [d for d in dirnames if d != ".git"]
         for navn in filenames:
@@ -141,8 +151,17 @@ def main():
             if os.path.splitext(navn)[1].lower() not in PROSA_ENDELSER:
                 continue
             sti = os.path.join(dirpath, navn)
-            for nr, besked in tjek_fil(sti, ordliste, filnavne):
-                alle_fund.append("%s:%d: %s" % (os.path.relpath(sti, args.rod), nr, besked))
+            prosa_filer.append(sti)
+            filnavne.add(os.path.splitext(navn)[0].lower())
+    if ordliste_sti:
+        print("ordliste: %s (%d ord)" % (ordliste_sti, len(ordliste)))
+    else:
+        print("ordliste: ingen system-ordliste fundet — bruger kun indbygget KENDTE_FEJL")
+
+    alle_fund = []
+    for sti in prosa_filer:
+        for nr, besked in tjek_fil(sti, ordliste, filnavne):
+            alle_fund.append("%s:%d: %s" % (os.path.relpath(sti, args.rod), nr, besked))
 
     if alle_fund:
         print("SPROG/ORTOGRAFI FEJL (%d):" % len(alle_fund))
