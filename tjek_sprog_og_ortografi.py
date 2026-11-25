@@ -18,11 +18,14 @@ Lag 2, stavetjek mod ordliste: hvis en dansk ordliste findes (--ordliste
 <sti> eller /usr/share/dict/da*), tjekkes hver prosa-token mod den; ellers
 bruges den indbyggede liste over kendte fejl (KENDTE_FEJL).
 
-Lag 3, bindestregsbrug: dansk skrives sammenhængende (uden bindestreg);
-bindestreg tillades ved låneord/forkortelser og tekniske termer (git-, mål-,
-ascii-, test-, host-loop, know-how, read-only, end-to-end m.fl.). Danske
-enkeltord, der ikke må splittes med bindestreg, står i KENDTE_BINDESTREG_FEJL
-(f.eks. genoptagelses-regel -> genoptagelsesregel).
+Lag 3, bindestregsbrug (regressionsbeskyttelse): dansk skrives sammenhængende
+(uden bindestreg); bindestreg tillades ved låneord/forkortelser og tekniske
+termer (git-, mål-, ascii-, test-, host-loop, know-how, read-only, end-to-end
+m.fl.). KENDTE_BINDESTREG_FEJL lister tidligere rettede fejl, så de ikke
+genintroduceres (f.eks. genoptagelses-regel -> genoptagelsesregel). Den GENERELLE
+regel — flag enhver bindestreg-sammensætning, hvis den sammenhængende form står
+i ordlisten — aktiveres automatisk, når en dansk ordliste findes (--ordliste);
+uden ordliste er kun den kuraterede liste mulig.
 
 Exit 0 hvis rent, ellers exit 1 med alle fund (fil:linje: hvad).
 """
@@ -62,6 +65,7 @@ KENDTE_FEJL = {
 KENDTE_BINDESTREG_FEJL = {
     "genoptagelses-regel": "genoptagelsesregel",
     "genoptagelsesregel-testen": "genoptagelsesregeltesten",
+    "bindestregs-lag": "bindestregslag",
 }
 
 BINDESTREG_SAMMENSAT = re.compile(r"\b[A-Za-zÆØÅæøå]+-[A-Za-zÆØÅæøå]+(?:-[A-Za-zÆØÅæøå]+)*\b")
@@ -112,7 +116,9 @@ def tjek_fil(sti, ordliste, filnavne):
                 ord_ = m.group(0)
                 lav = ord_.lower()
                 if lav in KENDTE_BINDESTREG_FEJL:
-                    fund.append((nr, "bindestreg i enkeltord: %s -> %s" % (ord_, KENDTE_BINDESTREG_FEJL[lav])))
+                    fund.append((nr, "kendt bindestregsfejl (regression): %s -> %s" % (ord_, KENDTE_BINDESTREG_FEJL[lav])))
+                elif ordliste is not None and ord_.replace("-", "") in ordliste:
+                    fund.append((nr, "bindestreg, men sammenhængende form er et dansk ord: %s -> %s" % (ord_, ord_.replace("-", ""))))
             tekst = KLASSE_NAVN.sub(" ", TEKNISK_SAMMENSAT.sub(" ", tekst0))
             for m in ASCII_UDVANDING.finditer(tekst):
                 if m.group(0) in filnavne:
