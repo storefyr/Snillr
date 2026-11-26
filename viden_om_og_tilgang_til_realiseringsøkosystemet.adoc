@@ -135,6 +135,10 @@ Trinvis åbning af øgede rettigheder på måleenheden (f.eks. terminal-adgang f
 
 Et realiseringsøkosystem betragtes som realiseret, når kæden kører end-to-end på måleenheden med målt exit-kode, alle funktioner i manifestet har `passerer: sand`, alle parrede tests er grønne, alle stokastiker-artefakter ligger sporbare i kildekodelageret, og distributionsartefaktet desuden er bygget som mål-byg, udgivet på kildekodelageret, hentet, installeret og kørt igennem på måleenheden.
 
+== Kendte begrænsninger ved stokastiker-modellen
+
+Stokastiker-modellen (mistral-large-4-0) laver helt basale danske sprogfejl — engelske låneord i dansk prosa og forkerte sammensætninger (f.eks. `rollentabel` i stedet for rolletabel). Sprog-kontrollen i depotet (`tjek_sprog_og_ortografi.py`) dækker kun artefakter, ikke den direkte dialog, hvor fejlene faktisk opstår. Derfor gælder: grundinstruktionen følges i hver samtale, orkestratoren påtaler fejl med det samme, og stokastikeren kører selvtjek før afsendelse (se integrationsprøven ovenfor). Kend denne begrænsning før første arbejdsgang.
+
 == Hvad der blev i Skrynja_2
 
 Alt specifikt for Skrynja_2's eget distributionsartefakt bliver i kildeøkosystemets plan: app-navn og platform (Sailfish OS, Jolla Phone), teknisk ramme (Qt 5.6, kun aarch64 mål-byg), protokol og agentsti (ACP over stdio, sti til agent-binær), harbour-packaging (`.pro`, `.spec`, `.yaml`, `.desktop`, ikoner) samt mål-byg og installation med Sailfish SDK. Kun metoden, rollerne, arbejdsreglerne og erfaringerne ovenfor er overført hertil.
