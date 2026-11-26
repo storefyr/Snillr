@@ -12,7 +12,7 @@ Indholdet er ikke knyttet til Skrynja_2's eget distributionsartefakt (app, platf
 
 * Producent: Orkestreringsstokastikeren.
 * Konsument: enhver stokastiker i ethvert realiseringsøkosystem.
-* Licens: GPL-3.0 (samme som kildeøkosystemet).
+* Licens: GPL-3.0 — samme som i kilde-depotet `storefyr/Skrynja_2`, som denne viden er udtrukket fra (de to LICENSE-filer er byte-identiske).
 
 == Vision: realisering som en kæde af stokastikere
 
