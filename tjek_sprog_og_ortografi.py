@@ -56,7 +56,7 @@ STEDORD = re.compile(r"\b(?:jeg|du|dig|mig)\b", re.IGNORECASE)
 
 TILLADTE_LINJER = ("stedordsregel", "terminologi", "ortografi",
                    "eskalering", "historisk", "lukket", "aa/ae/oe",
-                   "ascii", "kommando", ".cpp", "filnavn")
+                   "ascii", "kommando", ".cpp", "filnavn", "måling", "logpost")
 
 KENDTE_FEJL = {
     "rollentabel": "rolletabel",
@@ -67,6 +67,7 @@ KENDTE_BINDESTREG_FEJL = {
     "genoptagelsesregel-testen": "genoptagelsesregeltesten",
     "bindestregs-lag": "bindestregslag",
     "sprog-reglen": "sprogreglen",
+    "sprog-reglerne": "sprogreglerne",
     "succeskriterium-skabelon": "succeskriteriumsskabelon",
 }
 
