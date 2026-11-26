@@ -3,7 +3,7 @@
 """Sprog- og ortografikontrol i værtsløkken — tre lag.
 
 Lag 1, forbudte mønstre i prosa (kun prosa-artefakter: .adoc .md .json .py .txt;
-kildekode er engelsk/ascii efter sprog-reglen og er en tvangne undtagelse):
+kildekode er engelsk/ascii efter sprogreglen og er en tvangne undtagelse):
   - ascii-udvanding af dansk (aa/ae/oe i stedet for å/æ/o),
   - engelske fagord (merge/draft/commit/branch/backend/token, persistence,
     resume, review, process, know-how) uden for backticks,
@@ -66,6 +66,8 @@ KENDTE_BINDESTREG_FEJL = {
     "genoptagelses-regel": "genoptagelsesregel",
     "genoptagelsesregel-testen": "genoptagelsesregeltesten",
     "bindestregs-lag": "bindestregslag",
+    "sprog-reglen": "sprogreglen",
+    "succeskriterium-skabelon": "succeskriteriumsskabelon",
 }
 
 BINDESTREG_SAMMENSAT = re.compile(r"\b[A-Za-zÆØÅæøå]+-[A-Za-zÆØÅæøå]+(?:-[A-Za-zÆØÅæøå]+)*\b")
