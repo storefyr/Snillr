@@ -99,7 +99,7 @@ Før første arbejdsgang gennemfører en nystartet stokastiker denne prøve (spe
 
 . Læs planen (projektbeskrivelsen) — især afsnittene om teknisk ramme (sprog, ortografi, terminologi, navngivning, grundinstruktion), arbejdsform (én funktion ad gangen, parret prøve før kilde, CI-regel, tilbudsregel) samt kommandokæde og eskaleringer (stedordsregel, triage-logik, integrationsregel).
 . Kan forklare sin egen rolle, sit mandat og kommandokæden ud fra artefakterne (rollentabellen ovenfor).
-. Kører værtsløkkens parrede kontroller og får exit 0 (f.eks. manifest-kontrol, spejlkontrol, sprog-kontrol).
+. Kører værtsløkkens parrede kontroller og får exit 0 (f.eks. manifestkontrol, spejlkontrol, sprogkontrollen).
 . Kører genoptagelsesreglen: `pwd`, `git status`, `git log --oneline -20`, læs realiseringsmanifestet, vælg den første funktion i rækkefølgen med `passerer: false`.
 . Ved, at første artefakt efter prøven altid indskrives i git (Sufflør), så næste samtale kan læse fremdriften.
 
@@ -135,9 +135,9 @@ Trinvis åbning af øgede rettigheder på måleenheden (f.eks. terminal-adgang f
 
 Et realiseringsøkosystem betragtes som realiseret, når kæden kører end-to-end på måleenheden med målt exit-kode, alle funktioner i manifestet har `passerer: sand`, alle parrede tests er grønne, alle stokastiker-artefakter ligger sporbare i kildekodelageret, og distributionsartefaktet desuden er bygget som mål-byg, udgivet på kildekodelageret, hentet, installeret og kørt igennem på måleenheden.
 
-== Kendte begrænsninger ved stokastiker-modellen
+== Kendte begrænsninger ved stokastikermodellen
 
-Stokastiker-modellen (mistral-large-4-0) laver helt basale danske sprogfejl — engelske låneord i dansk prosa og forkerte sammensætninger (f.eks. `rollentabel` i stedet for rolletabel). Sprog-kontrollen i depotet (`tjek_sprog_og_ortografi.py`) dækker kun artefakter, ikke den direkte dialog, hvor fejlene faktisk opstår. Derfor gælder: grundinstruktionen følges i hver samtale, orkestratoren påtaler fejl med det samme, og stokastikeren kører selvtjek før afsendelse (se integrationsprøven ovenfor). Kend denne begrænsning før første arbejdsgang.
+Stokastikermodellen (mistral-large-4-0) laver helt basale danske sprogfejl — engelske låneord i dansk prosa og forkerte sammensætninger (f.eks. `rollentabel` i stedet for rolletabel). Sprogkontrollen i depotet (`tjek_sprog_og_ortografi.py`) dækker kun artefakter, ikke den direkte dialog, hvor fejlene faktisk opstår. Derfor gælder: grundinstruktionen følges i hver samtale, orkestratoren påtaler fejl med det samme, og stokastikeren kører selvtjek før afsendelse (se integrationsprøven ovenfor). Kend denne begrænsning før første arbejdsgang.
 
 == Hvad der blev i Skrynja_2
 

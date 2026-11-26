@@ -69,6 +69,10 @@ KENDTE_BINDESTREG_FEJL = {
     "sprog-reglen": "sprogreglen",
     "sprog-reglerne": "sprogreglerne",
     "succeskriterium-skabelon": "succeskriteriumsskabelon",
+    "depot-laget": "depotlaget",
+    "stokastiker-modellen": "stokastikermodellen",
+    "sprog-kontrol": "sprogkontrol",
+    "sprog-kontrollen": "sprogkontrollen",
 }
 
 BINDESTREG_SAMMENSAT = re.compile(r"\b[A-Za-zÆØÅæøå]+-[A-Za-zÆØÅæøå]+(?:-[A-Za-zÆØÅæøå]+)*\b")
