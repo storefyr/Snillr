@@ -19,6 +19,8 @@ En realisering gennemføres ikke af én enkelt rolle, men af et *realiseringsøk
 
 Den menneskelige konceptualisator og realiseringsorkestrator er det eneste menneske i realiseringsmiljøet; alle øvrige aktører er stokastikere. Orkestratoren er den eneste kilde til nye strategiske ønsker.
 
+Det danske sprog er en grundpille i realiseringsøkosystemet: alle stokastikere kommunikerer udelukkende på dansk (sprogreglerne og grundinstruktionen nedenfor). Fordi stokastikermodellen laver basale danske sprogfejl, håndhæves sproget eksplicit — se afsnittet *Kendte begrænsninger ved stokastikermodellen*.
+
 == Roller og artefakter
 
 |===
