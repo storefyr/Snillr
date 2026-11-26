@@ -12,7 +12,6 @@ Indholdet er ikke knyttet til Skrynja_2's eget distributionsartefakt (app, platf
 
 * Producent: Orkestreringsstokastikeren.
 * Konsument: enhver stokastiker i ethvert realiseringsøkosystem.
-* Licens: GPL-3.0 — samme som i kilde-depotet `storefyr/Skrynja_2`, som denne viden er udtrukket fra (de to LICENSE-filer er byte-identiske).
 
 == Vision: realisering som en kæde af stokastikere
 
@@ -27,7 +26,7 @@ Den menneskelige konceptualisator og realiseringsorkestrator er det eneste menne
 
 | Menneskelig konceptualisator og realiseringsorkestrator
 | Visionen (håndtegnet skitse)
-| Konceptualiserer visionen og orkestrerer realiseringen; eneste kilde til nye strategiske ønsker. Udfører aldrig integrationer — programmel fremkaldes udelukkende ved at prompte maskinelle stokastikere.
+| Konceptualiserer visionen og orkestrerer realiseringen; eneste kilde til nye strategiske ønsker. Udfører aldrig integrationer — programmel fremkaldes udelukkende ved at sufflere maskinelle stokastikere.
 
 | Strategistokastiker
 | Projektbeskrivelse (strategisk plan, f.eks. `projektbeskrivelse.adoc`)
@@ -90,9 +89,9 @@ Triage-logik ved kildesondringsvurdering:
 . Terminologi: dansk frem for engelsk fagsprog i prosa — `merge`→integration/integreres/integreret, `draft`→kladde, `commit`→indskrivning, `branch`→gren, `backend`→bagvedliggende system, `token`→adgangstoken, `gate`→spærre, `test-first`→prøveførst. Egennavne, protokol-/platformtermer samt kommandoer og API-stier i backticks undtages; i historiske logposter bevares id'er, hashes og citeret tekst, men terminologien gælder også dér.
 . Stedordsregel: i artefakter og relæer mellem stokastikere bruges aldrig "jeg/du/dig/mig" — brug rollens navn (orkestratoren, strategistokastikeren, projektstokastikeren, ...), så det altid er entydigt, hvem der menes. I direkte dialog mellem to parter er stedordene entydige og tilladt.
 . Navngivning: ethvert navn — funktioner, id'er, nøgler, filer, roller, artefakter, variabler, PR-titler — skal i sig selv fortælle præcist, hvad det er et navn for, på fuldt dansk sammen med ortografi-reglen. Ingen afkortninger eller præfiks-koder (`fragilitet_...`, aldrig `fra-...`; `arkitektur_...`, aldrig `ark-...`; `støj_...` er i orden, fordi "støj" er hele ordet). Undtagelse: historiske id'er i lukkede triage-poster er uforanderlig log og omdøbes ikke; reglen gælder alle nye navne.
-. Tilbudsregel: stokastikere stiller kun tilbud eller eskaleringer til den menneskelige realiseringsorkestrator, når de følges af en måling (gengivelig uddata fra værtsløkken eller måleløkken) og et artefakt (git-indskrivning, PR, manifest-post eller vurderings-JSON). Når måling og artefakt er på plads, leveres tilbuddet direkte som artefakt uden forudgående spørgsmål — svaret kan kun være ja; orkestratoren handler på artefaktet ved at prompte stokastikere (integration, beslutning, nyt strategisk ønske), og selve integrationen udføres altid af en stokastiker.
+. Tilbudsregel: stokastikere stiller kun tilbud eller eskaleringer til den menneskelige realiseringsorkestrator, når de følges af en måling (gengivelig uddata fra værtsløkken eller måleløkken) og et artefakt (git-indskrivning, PR, manifest-post eller vurderings-JSON). Når måling og artefakt er på plads, leveres tilbuddet direkte som artefakt uden forudgående spørgsmål — svaret kan kun være ja; orkestratoren handler på artefaktet ved at sufflere stokastikere (integration, beslutning, nyt strategisk ønske), og selve integrationen udføres altid af en stokastiker.
 . Ingen CI-overvågning uden CI: tjek først, om depotet har CI-arbejdsgange (`.github/workflows/`). Findes der ingen, sker verifikation i værtsløkken (parrede kontroller + testsuite samt mål-byg og kørsel på måleenheden), og der tilbydes ikke CI-overvågning. Får depotet senere CI-arbejdsgange, gælder tilbud om CI-overvågning først fra det øjeblik, de findes.
-. Integrationsregel: integration af PRs i hovedgrenen udføres udelukkende af stokastikere — med hvilken som helst mekanisme der virker i det pågældende miljø (git push, API-kald eller andet; blokerer sandkassens API-mellemlag `merge`-kald, er git push den virkende vej). Den menneskelige orkestrator har aldrig udført en integration i noget depot — programmel fremkaldes udelukkende ved, at orkestratoren prompter maskinelle stokastikere (orkestratorens præcisering 2026-11-23).
+. Integrationsregel: integration af PRs i hovedgrenen udføres udelukkende af stokastikere — med hvilken som helst mekanisme der virker i det pågældende miljø (git push, API-kald eller andet; blokerer sandkassens API-mellemlag `merge`-kald, er git push den virkende vej). Den menneskelige orkestrator har aldrig udført en integration i noget depot — programmel fremkaldes udelukkende ved, at orkestratoren sufflerer maskinelle stokastikere (orkestratorens præcisering 2026-11-23).
 
 == Integrationsprøve for nystartede stokastikere
 
@@ -124,12 +123,12 @@ Trinvis åbning af øgede rettigheder på måleenheden (f.eks. terminal-adgang f
 
 == Læring fra arkitektur-triage (generiske principper)
 
-* God-objekter med hård kobling accepteres ikke: opdel efter lag (protokol, session, brugerflade-modeller), hver i sin klasse, med en tynd façade foran, der kun udstiller Q_PROPERTYs og videresender signaler.
-* Test-kroge må ikke ligge i produktionsklasser: test-injektion hører i en separat test-harness; adfærd under test må ikke kunne afvige fra drift.
+* God-objekter med hård kobling accepteres ikke: opdel efter lag (protokol, session, brugerflade-modeller), hver i sin klasse, med en tynd façade foran, der kun udstiller egenskaber og videresender signaler.
+* Test-kroge må ikke ligge i produktionsklasser: prøveinjektion hører i et separat prøveværktøj; adfærd under prøve må ikke kunne afvige fra drift.
 * Magiske strenge (metode-navne, nøgler) samles som navngivne konstanter ét sted, så en omdøbning ikke kan give stille korrelationsfejl.
 * Afhængighedsretningen skal vende væk fra kernen: UI-lag må ikke kende transport-laget; fælles konstanter ligger i et fælles konstant-modul eller gives som parameter.
 * Konfiguration har én ejer med change-signaler — ikke skjult global tilstand læst i spredte gettere.
-* Ét model-lag, ikke to: fjern model-lag uden konsument; brugerfladen fortsætter uændret via QVariantList-properties.
+* Ét model-lag, ikke to: fjern model-lag uden konsument; brugerfladen fortsætter uændret via enkle listeegenskaber.
 * Hver opdeling uden ny funktionalitet dækkes af de eksisterende parrede tests, og manifestets redigeringsregel følges (nye funktioner tilføjes, eksisterende verifikations_trin fjernes ikke).
 
 == Succeskriterium (skabelon)
